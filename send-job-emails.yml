@@ -1,0 +1,29 @@
+name: Daily Job Interest Email
+
+on:
+  schedule:
+    - cron: "0 3 * * *"  # runs every day at 8:30 AM IST (03:00 UTC)
+  workflow_dispatch:       # allows manual run
+
+jobs:
+  send_emails:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install @supabase/supabase-js nodemailer
+
+      - name: Run daily email script
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: node .github/workflows/sendEmails.js
